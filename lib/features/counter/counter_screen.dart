@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hourify/contoler/app_catagories.dart';
 import 'package:hourify/contoler/counter_storage.dart';
+import 'package:hourify/contoler/counter_stroge_sf.dart';
 import 'package:hourify/features/counter/widgets/catagori.dart';
 import 'package:hourify/features/counter/widgets/cs_custom_app_color.dart';
 import 'package:hourify/features/counter/widgets/cs_custom_button_style.dart';
@@ -81,7 +82,7 @@ class _CounterScreenState extends State<CounterScreen> {
     });
   }
 
-void _saveData(){
+void _saveData() async{
     if(selectedItem == 'Select Item'){
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select an item first!'))
@@ -96,6 +97,9 @@ void _saveData(){
       return;
     }
     _timer?.cancel();
+
+    await CounterStrogeSf.SvateTime(selectedItem, _seconds);
+
     CounterStorage.saveTime(selectedItem, _seconds);
 
     setState(() {
