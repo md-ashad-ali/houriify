@@ -35,11 +35,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         .map((category) => CounterStorage.getTime(category))
         .toList();
 
-    /*final maxTime = times.fold<int>(
-      0,
-          (previous, current) =>
-      current > previous ? current : previous,
-    );*/
+
 
     const int minimumMaxTime = 8 * 3600;
     final recordedMaxTime = times.fold<int>(

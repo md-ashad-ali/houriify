@@ -20,12 +20,44 @@ class CounterScreen extends StatefulWidget {
   State<CounterScreen> createState() => _CounterScreenState();
 }
 
-class _CounterScreenState extends State<CounterScreen> {
+class _CounterScreenState extends State<CounterScreen> with WidgetsBindingObserver {
   String selectedItem = 'Select Item';
 
   Timer? _timer;
   int _seconds = 0;
   bool _isRunning = false;
+
+  DateTime? _startTime;
+  int _elapsedBeforePause = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && _isRunning) {
+      _updateSeconds();
+    }
+  }
+  void _updateSeconds() {
+    if (_startTime != null && _isRunning) {
+      final now = DateTime.now();
+      final difference = now.difference(_startTime!).inSeconds;
+      setState(() {
+        _seconds = _elapsedBeforePause + difference;
+      });
+    }
+  }
+
 
   String _formateTime(int totalsecond){
     int hours = totalsecond ~/ 3600;
@@ -52,7 +84,10 @@ class _CounterScreenState extends State<CounterScreen> {
 
     if (_isRunning) return;
 
-    _isRunning = true;
+    setState(() {
+      _isRunning = true;
+      _startTime = DateTime.now();
+    });
 
     _timer = Timer.periodic(
       const Duration(seconds: 1),
@@ -69,7 +104,10 @@ class _CounterScreenState extends State<CounterScreen> {
     if(_timer != null && _timer!.isActive){
       _timer!.cancel();
       setState(() {
-        _isRunning =false;
+        _elapsedBeforePause = _seconds;
+        _isRunning = false;
+        _startTime = null;
+
       });
     }
   }
